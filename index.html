@@ -22,7 +22,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap">
 <style>
 :root{
   color-scheme:light;
@@ -31,9 +31,9 @@
   --accent:#C2185B;--accent-ink:#A3134C;--accent-soft:#FCEAF1;
   --frozen:#7440C9;--init:#8C909C;--easy:#0E8A5F;--hard:#D23B34;--pred:#E3A600;--repr:#E9B000;
   --series-base:#1C4F98;--series-full:#9AA0AC;--gain:#1E9E57;--too-easy:#8FB5E3;--too-hard:#E6A4A0;--plate:#FFFFFF;
-  --serif:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --sans:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --mono:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --serif:"Google Sans","Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --sans:"Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -52,7 +52,7 @@ h1 .name{font-variant:small-caps;letter-spacing:.015em}
 h1 .name span{color:var(--accent)}
 h1{font-size:clamp(26px,3.6vw,38px)}
 .venue{margin-top:12px;font-size:16px;font-weight:600;color:var(--accent-ink);letter-spacing:.02em}
-.authors{margin-top:18px;font-size:17px;display:flex;flex-wrap:wrap;justify-content:center;column-gap:18px;row-gap:2px}
+.authors{font-family:var(--serif);margin-top:18px;font-size:17px;display:flex;flex-wrap:wrap;justify-content:center;column-gap:18px;row-gap:2px}
 .authors span{white-space:nowrap}
 .authors sup,.affil sup{font-size:.68em;color:var(--accent-ink);font-weight:600;margin-left:1px}
 .affil{margin-top:6px;font-size:14.5px;color:var(--ink-2);display:flex;flex-wrap:wrap;justify-content:center;column-gap:20px}
@@ -662,7 +662,7 @@ function frame(v){
 }
 function labels(ctx, g){
   if (g.S < 120) return;   // small maps: labels would pile up; hovering a cluster still names it
-  ctx.font = '500 ' + (g.S > 150 ? 11.5 : 10) + 'px "Public Sans", system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+  ctx.font = '500 ' + (g.S > 150 ? 11.5 : 10) + 'px "Noto Sans", system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
   var placed = [], lh = g.S > 150 ? 13 : 11;
   CLS.forEach(function(c){
     var w = ctx.measureText(c.label).width;
@@ -1029,7 +1029,7 @@ var SP;  // current space rect
 function RX(){ return narrow ? SP.x + 14 : SP.x + SP.w - 14; } function RY(){ return narrow ? SP.y + SP.h - 14 : SP.y + 16; } function RA(){ return narrow ? 'left' : 'right'; }
 function PX(p){ return SP.x + 24 + p.x*(SP.w - 48); }
 function PY(p){ return SP.y + 22 + p.y*(SP.h - 44); }
-function font(sz, w){ ctx.font = (w || 500) + ' ' + (sz*FS) + 'px "Public Sans", system-ui, sans-serif'; }
+function font(sz, w){ ctx.font = (w || 500) + ' ' + (sz*FS) + 'px "Noto Sans", system-ui, sans-serif'; }
 function text(s, x, y, sz, colr, align, w){ font(sz, w); ctx.fillStyle = colr || col['--ink']; ctx.textAlign = align || 'left'; ctx.textBaseline = 'middle'; ctx.fillText(s, x, y); }
 function diamond(x, y, r, fill, stroke, lw){ ctx.beginPath(); ctx.moveTo(x, y - r); ctx.lineTo(x + r, y); ctx.lineTo(x, y + r); ctx.lineTo(x - r, y); ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); if (stroke){ ctx.lineWidth = lw || 1.2; ctx.strokeStyle = stroke; ctx.stroke(); } }
 function star4(x, y, r, fill, stroke){ ctx.beginPath(); for (var i = 0; i < 8; i++){ var a = -Math.PI/2 + i*Math.PI/4, rr = i % 2 ? r*0.36 : r; ctx.lineTo(x + rr*Math.cos(a), y + rr*Math.sin(a)); } ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); ctx.lineWidth = 1.4; ctx.strokeStyle = stroke; ctx.stroke(); }
