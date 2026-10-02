@@ -611,7 +611,7 @@ function ease(x){ x = clamp(x, 0, 1); return x < .5 ? 2*x*x : 1 - Math.pow(-2*x 
 
 var TD = JSON.parse(document.getElementById('teaserData').textContent);
 var col = {};
-function readColors(){ var s = getComputedStyle(document.documentElement); ['--ink','--ink-2','--ink-3','--init','--accent','--frozen','--gain','--too-easy','--too-hard','--repr','--surface','--rule','--series-base','--series-full'].forEach(function(k){ col[k] = s.getPropertyValue(k).trim(); }); }
+function readColors(){ var s = getComputedStyle(document.documentElement); ['--ink','--ink-2','--ink-3','--init','--accent','--frozen','--gain','--too-easy','--too-hard','--repr','--surface','--surface-2','--rule','--series-base','--series-full'].forEach(function(k){ col[k] = s.getPropertyValue(k).trim(); }); }
 readColors();
 
 function inPoly(x, y, poly){ var ins = false; for (var i = 0, j = poly.length - 1; i < poly.length; j = i++){ var a = poly[i], b = poly[j]; if ((a[1] > y) !== (b[1] > y) && x < (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]) + a[0]) ins = !ins; } return ins; }
