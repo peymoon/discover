@@ -350,7 +350,7 @@ footer{margin-top:56px;border-top:1px solid var(--rule);padding-block:24px 36px;
     <div class="authors">
       <span><a href="https://peymoon.github.io/" target="_blank" rel="noopener">Peyman Gholami</a><sup>1</sup></span>
       <span>Shivam Chandhok<sup>*1</sup></span>
-      <span>Saber Malekmohammadi<sup>*2</sup></span>
+      <span>Saber Malekmohammadi<sup>*2,3</sup></span>
       <span>Shayan Shams<sup>2</sup></span>
       <span><a href="https://www.robertxiao.ca/" target="_blank" rel="noopener">Robert Xiao</a><sup>1</sup></span>
       <span><a href="https://www.cs.ubc.ca/~lsigal/" target="_blank" rel="noopener">Leonid Sigal</a><sup>1</sup></span>
@@ -358,12 +358,12 @@ footer{margin-top:56px;border-top:1px solid var(--rule);padding-block:24px 36px;
     <div class="affil">
       <span><sup>1</sup>University of British Columbia</span>
       <span><sup>2</sup>UTHealth Houston</span>
+      <span><sup>3</sup>Stanford University</span>
     </div>
     <div class="buttons">
-      <a class="btn" href="static/pdf/DISCOVER.pdf" target="_blank" rel="noopener">
+      <a class="btn" href="https://neurips.cc/virtual/2026/loc/sydney/poster/155862" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Paper
       </a>
-      <!-- TODO: add href to the arXiv page, then drop class "soon", aria-disabled and the tag span -->
       <a class="btn" href="https://arxiv.org/abs/2611.11145" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>arXiv</a>
       <!-- TODO: add href to the code repository -->
       <a class="btn soon" aria-disabled="true">Code <span class="tag">soon</span></a>
@@ -1041,13 +1041,21 @@ function uCol(x){ return mix('#F3F4F7', '#C2185B', clamp(x, 0, 1)); }
 
 /* data: 4 clusters, like Figure 1 */
 var CL = [
-  { x:.25, y:.30, c:'#5B7DB8', t:'#E3E9F3', d:.45, name:'C1', rx:.22, ry:.2, rot:-14 },
-  { x:.73, y:.27, c:'#3E8E8A', t:'#DFEDEC', d:.86, name:'C2', rx:.2, ry:.21, rot:20 },
-  { x:.29, y:.74, c:'#B07D2A', t:'#F3EADB', d:.12, name:'C3', rx:.2, ry:.18, rot:9 },
-  { x:.72, y:.72, c:'#8B6BB0', t:'#ECE6F3', d:.62, name:'C4', rx:.215, ry:.18, rot:-17 }
+  { x:.25, y:.30, c:'#4F7FD9', t:'#DCE6FA', d:.45, name:'C1', rx:.22, ry:.2, rot:-14 },
+  { x:.73, y:.27, c:'#3E9B3E', t:'#DDF0DA', d:.86, name:'C2', rx:.2, ry:.21, rot:20 },
+  { x:.29, y:.74, c:'#D9534F', t:'#F9DEDC', d:.12, name:'C3', rx:.2, ry:.18, rot:9 },
+  { x:.72, y:.72, c:'#8E63C7', t:'#EADFF7', d:.62, name:'C4', rx:.215, ry:.18, rot:-17 }
 ];
 var P = [];
-CL.forEach(function(c, ci){ for (var i = 0; i < 26; i++) P.push({ x:clamp(c.x + hg()*.085, .05, .95), y:clamp(c.y + hg()*.075, .06, .94), c:ci, emit:0, repr:-1 }); });
+/* clusters of different size, spread and orientation, plus a few stray prompts between them */
+var SHAPE = [ { n:30, sx:.105, sy:.055, rot:-22 }, { n:21, sx:.06, sy:.048, rot:18 }, { n:26, sx:.085, sy:.06, rot:28 }, { n:28, sx:.115, sy:.058, rot:-32 } ];
+CL.forEach(function(c, ci){ var sh = SHAPE[ci], ca = Math.cos(sh.rot*Math.PI/180), sa = Math.sin(sh.rot*Math.PI/180);
+  for (var i = 0; i < sh.n; i++){ var a = hg()*sh.sx, b = hg()*sh.sy;
+    P.push({ x:clamp(c.x + a*ca - b*sa, .05, .95), y:clamp(c.y + a*sa + b*ca, .06, .94), c:ci, emit:0, repr:-1 }); } });
+[[.50,.30],[.47,.55],[.52,.78],[.15,.52],[.88,.47],[.60,.45]].forEach(function(q){
+  var x = clamp(q[0] + hg()*.02, .05, .95), y = clamp(q[1] + hg()*.02, .06, .94), b = 0, bd = 9;
+  CL.forEach(function(c, k){ var d = Math.hypot(c.x - x, c.y - y); if (d < bd){ bd = d; b = k; } });
+  P.push({ x:x, y:y, c:b, emit:0, repr:-1, stray:true }); });
 var order = P.map(function(_, i){ return i; }).sort(function(){ return HR() - .5; });
 order.forEach(function(pi, r){ P[pi].emit = r / P.length; });
 
@@ -1175,14 +1183,21 @@ function tick(x, y, s, ok){ ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.stro
 function arrow(x1, y1, x2, y2, c, w){ ctx.strokeStyle = c; ctx.fillStyle = c; ctx.lineWidth = w || 2; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); var a = Math.atan2(y2 - y1, x2 - x1), h = 7; ctx.beginPath(); ctx.moveTo(x2, y2); ctx.lineTo(x2 - h*Math.cos(a - .45), y2 - h*Math.sin(a - .45)); ctx.lineTo(x2 - h*Math.cos(a + .45), y2 - h*Math.sin(a + .45)); ctx.closePath(); ctx.fill(); }
 
 function drawSpace(label){
-  ctx.save(); rrect(SP.x, SP.y, SP.w, SP.h, 14); ctx.fillStyle = '#F7F8F9'; ctx.fill(); ctx.setLineDash([6, 5]); ctx.lineWidth = 1.3; ctx.strokeStyle = '#D3D7DD'; ctx.stroke(); ctx.setLineDash([]); ctx.restore();
+  ctx.save(); rrect(SP.x, SP.y, SP.w, SP.h, 14); ctx.fillStyle = '#F6FAF4'; ctx.fill(); ctx.setLineDash([5, 4]); ctx.lineWidth = 1.2; ctx.strokeStyle = '#9CC79A'; ctx.stroke(); ctx.setLineDash([]); ctx.restore();
   if (label) text(label, SP.x + 14, SP.y + 16, 12, col['--ink-3'], 'left', 600);
 }
-function clusterTint(alpha){ if (alpha <= 0) return; var g = .88 + .12*alpha;
-  CL.forEach(function(c){ var sx = SP.w - 48, sy = SP.h - 44, r = Math.min(sx, sy);
-    ctx.beginPath(); ctx.ellipse(SP.x + 24 + c.x*sx, SP.y + 22 + c.y*sy, r*c.rx*g*(sx/r*.62 + .38), r*c.ry*g, c.rot*Math.PI/180, 0, Math.PI*2);
-    ctx.globalAlpha = .14*alpha; ctx.fillStyle = c.c; ctx.fill();
-    ctx.globalAlpha = .38*alpha; ctx.lineWidth = 1.4; ctx.strokeStyle = c.c; ctx.stroke(); });
+/* cluster outline: a 2.2-sigma ellipse fitted to the cluster's own prompts (in screen space) */
+function ellOf(ci){ var m = P.filter(function(p){ return p.c === ci && !p.stray; }), n = m.length;
+  var mx = m.reduce(function(s, p){ return s + PX(p); }, 0)/n, my = m.reduce(function(s, p){ return s + PY(p); }, 0)/n, a = 0, b = 0, d = 0;
+  m.forEach(function(p){ var dx = PX(p) - mx, dy = PY(p) - my; a += dx*dx; b += dx*dy; d += dy*dy; }); a /= n; b /= n; d /= n;
+  var tr = (a + d)/2, q = Math.sqrt(Math.max(tr*tr - (a*d - b*b), 0)), ang = .5*Math.atan2(2*b, a - d);
+  var rx = 2.2*Math.sqrt(tr + q) + 9, ry = 2.2*Math.sqrt(Math.max(tr - q, 0)) + 9;
+  return { x:mx, y:my, rx:rx, ry:ry, ang:ang, hw:Math.hypot(rx*Math.cos(ang), ry*Math.sin(ang)), hh:Math.hypot(rx*Math.sin(ang), ry*Math.cos(ang)) }; }
+function clusterTint(alpha){ if (alpha <= 0) return; var g = .9 + .1*alpha;
+  CL.forEach(function(c, ci){ var e = ellOf(ci);
+    ctx.beginPath(); ctx.ellipse(e.x, e.y, e.rx*g, e.ry*g, e.ang, 0, Math.PI*2);
+    ctx.globalAlpha = alpha; ctx.fillStyle = c.t; ctx.fill();
+    ctx.globalAlpha = .55*alpha; ctx.lineWidth = 1.3; ctx.strokeStyle = c.c; ctx.stroke(); });
   ctx.globalAlpha = 1; }
 /* a prompt whose predicted pass rate is known: outlined diamond filled from the bottom up to that rate */
 function gauge(x, y, r, m, a){ var cc = muCol(m); ctx.save(); ctx.globalAlpha *= (a == null ? 1 : a);
@@ -1223,6 +1238,7 @@ function stage1(t){
   ctx.globalAlpha = 1;
   drawSpace(t > 4.6 ? 'spherical k-means' : 'embedding space');
   var inX = e.x - 4, inY = e.y + e.h/2, outX = e.x + e.w + 4, outY = e.y + e.h/2;
+  if (t > 7.4){ ctx.save(); clusterTint(seg(t, 7.4, 8.2)); ctx.restore(); }   // fitted cluster outlines, behind the points
   // stream of cards → encoder → points
   P.forEach(function(p){
     var te = .9 + p.emit*3.4;
@@ -1241,8 +1257,7 @@ function stage1(t){
       ctx.lineWidth = 2; ctx.strokeStyle = cc; ctx.stroke(); });
     text('iteration ' + (it0 + 1) + ' / ' + KM.length, RX(), RY(), 11, col['--ink-3'], RA(), 500);
   }
-  if (t > 7.4){ ctx.save(); clusterTint(seg(t, 7.4, 8.2)); ctx.restore(); }
-  if (t > 8){ ctx.globalAlpha = seg(t, 8, 8.6); CL.forEach(function(c){ text(c.name, SP.x + 24 + c.x*(SP.w - 48) + (SP.w - 48)*.15, SP.y + 22 + c.y*(SP.h - 44) - (SP.h - 44)*.14, 13, c.c, 'center', 700); }); ctx.globalAlpha = 1; }
+  if (t > 8){ ctx.globalAlpha = seg(t, 8, 8.6); CL.forEach(function(c, ci){ var e = ellOf(ci); text(c.name, e.x + e.hw*.78, e.y - e.hh*.92, 13, c.c, 'center', 700); }); ctx.globalAlpha = 1; }
 }
 /* ---- stage 2: REPR selection ---- */
 function spaceMove(t){ var k = ease(seg(t, 0, .9)); var a = L.s1, b = L.s2; SP = { x:lerp(a.x, b.x, k), y:lerp(a.y, b.y, k), w:lerp(a.w, b.w, k), h:lerp(a.h, b.h, k) }; }
