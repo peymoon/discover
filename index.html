@@ -275,6 +275,20 @@ td.best::after{content:"";display:inline-block;width:5px;height:5px;border-radiu
 .tnote{font-size:14px;color:var(--ink-3);margin:10px 0 0}
 .tabs{gap:10px;flex-wrap:wrap}
 .wrap-table{max-width:1240px}
+.figpair{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:12px 28px;margin-top:18px}
+.fig{margin:0}.fig svg{display:block;width:100%;height:auto;overflow:visible}
+.fig svg text{font-family:var(--sans)}.fig svg .halo{paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+.fig-t{font:700 15px var(--sans);color:var(--ink);margin:0 0 2px 4px}
+.figwide{margin-top:16px}
+.figkey{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px;font-size:14px;color:var(--ink-2);margin-top:6px}
+.figkey b{color:var(--ink)}.figkey span{white-space:nowrap}.figkey i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+details.full{margin-top:20px}
+details.full>summary{cursor:pointer;width:max-content;max-width:100%;margin:0 auto;padding:8px 16px;border:1px solid var(--rule);border-radius:999px;font:600 14px var(--sans);color:var(--ink-2);list-style:none}
+details.full>summary::-webkit-details-marker{display:none}
+details.full>summary::before{content:"▸";display:inline-block;margin-right:8px;transition:transform .15s}
+details.full[open]>summary::before{transform:rotate(90deg)}
+details.full>summary:hover{color:var(--ink);border-color:var(--ink-3)}
+details.full .tabs{margin-top:16px}
 .t1 td .rng,.t1 td .obs{display:block;line-height:1.25}
 .t1 td .rng{font-size:12px;color:var(--ink-3)}
 .t1 td .obs{font-size:13.5px}
@@ -494,6 +508,19 @@ footer{margin-top:56px;border-top:1px solid var(--rule);padding-block:24px 36px;
   <div class="wrap">
     <h2>Results</h2>
     <p class="prose" style="color:var(--ink-2)">Every method trains Qwen3-VL-2B with the same GRPO recipe and number of optimizer steps, and is evaluated on four multimodal math benchmarks. Budgeted methods differ only in which prompts they verify. With 10% of ViRL39K, <span class="sc">Discover</span> reaches a 13.12 average in the main run (Table 1), compared with 10.38 for Random-10% and 9.71 for training on the full split. Across three ViRL39K training seeds it averages 13.25 ± 0.55, compared with 10.01 ± 0.54 for Random-10%. Only 1.16% of the pool is verified first for the selector (the REPR probes), and there is no full-pool scan.</p>
+    <div class="tabs"><div role="tablist" aria-label="Answer-length cap at evaluation">
+      <button role="tab" aria-selected="true" data-rescap="512">512-token answers</button>
+      <button role="tab" aria-selected="false" data-rescap="2048">2,048-token answers</button>
+    </div></div>
+    <div class="figpair">
+      <figure class="fig"><div class="fig-t">Trained on ViRL39K</div><svg data-res="virl" viewBox="0 0 600 420" role="img" aria-label="Average accuracy against labelled share of the pool, ViRL39K"></svg></figure>
+      <figure class="fig"><div class="fig-t">Trained on VLAA-Thinking</div><svg data-res="vlaa" viewBox="0 0 600 420" role="img" aria-label="Average accuracy against labelled share of the pool, VLAA-Thinking"></svg></figure>
+    </div>
+    <div class="figkey"><span><b>Selection cost</b> (rollouts per pool prompt):</span> <span><i style="background:#9AA0AC"></i>none</span><span><i style="background:var(--accent)"></i>≈ 0.1 (<span class="sc">Discover</span>)</span><span><i style="background:#E3A600"></i>0.3–0.9</span><span><i style="background:#D23B34"></i>7.2</span></div>
+    <p class="caption">Each point is one GRPO run of Qwen3-VL-2B with the same number of optimizer steps; accuracy is the average over WeMath, MathVerse, MATH-Vision and DynaMath. Hard, MaxVar and VADE score the whole 90% training split to choose their prompts, so they label nine times more of the pool than the 10% methods.</p>
+  </div>
+  <details class="full wrap wrap-table">
+    <summary>Show full table: exposure, selector cost and per-benchmark accuracy</summary>
     <div class="tabs">
       <div role="tablist" aria-label="Training dataset">
         <button role="tab" aria-selected="true" data-ds="virl">ViRL39K</button>
@@ -504,11 +531,9 @@ footer{margin-top:56px;border-top:1px solid var(--rule);padding-block:24px 36px;
         <button role="tab" aria-selected="false" data-cap="2048">2,048 tokens</button>
       </div>
     </div>
-  </div>
-  <div class="wrap wrap-table">
     <div class="tablewrap"><table id="resTable" class="t1" aria-label="Table 1: benchmark accuracy, verified-prompt exposure and selector cost"></table></div>
     <p class="tnote">Table 1. External benchmark accuracy with verified-prompt exposure and selector cost. Exposure is a percentage of the full source pool, split by acquisition (Selector-first, Training-first) and by final use (Train, Probe-only); both views sum to Total. Range cells give deterministic admission bounds (not confidence intervals), with the observed value (obs.) below. Dense-scored baselines (Hard, MaxVar, VADE) scan the 90% training split and are not exposure-matched to strict-budget methods. Probe Gen.: selector-only generations as a multiple of the pool size N. A dot marks the best value in each accuracy column. Single training run per row. The 2,048-token view is Table 8 in the paper's appendix.</p>
-  </div>
+  </details>
   <div class="wrap">
     <div class="tgrid">
       <div><div class="tablewrap"><table aria-label="Table 2: average accuracy across three ViRL39K training seeds"><thead><tr><th>Method</th><th>Seed I</th><th>Seed II</th><th>Seed III</th><th>Mean ± SD</th></tr></thead><tbody><tr class="ours"><td><span class="sc">Discover</span>-10%</td><td>13.12</td><td>13.86</td><td>12.78</td><td>13.25 ± 0.55</td></tr><tr><td>Random-10%</td><td>10.38</td><td>10.25</td><td>9.39</td><td>10.01 ± 0.54</td></tr><tr class="ours"><td><span class="sc">Discover</span>-5%</td><td>10.53</td><td>13.18</td><td>15.09</td><td>12.93 ± 2.29</td></tr><tr><td>Random-5%</td><td>10.94</td><td>8.42</td><td>10.52</td><td>9.96 ± 1.35</td></tr></tbody></table></div><p class="tnote">Table 2. Average accuracy over three ViRL39K training seeds. At 10%, <span class="sc">Discover</span> beats Random by +3.25 ± 0.45 points (95% CI [2.12, 4.37]). Results at 5% vary more across seeds.</p></div>
@@ -521,11 +546,18 @@ footer{margin-top:56px;border-top:1px solid var(--rule);padding-block:24px 36px;
   <div class="wrap">
     <h2>Ablations</h2>
     <p class="prose" style="color:var(--ink-2)">Each row changes one part of <span class="sc">Discover</span> on ViRL39K under the same 10% budget. Spreading the budget over clusters without a utility score falls below Random-10%. Every replacement for neighbour transfer (random scores, Ridge, Ridge with extra probes, an MLP) loses accuracy. Ranking once and never refreshing loses over three points, and so does admitting new prompts more slowly. Every variant stays below the full method at both generation caps.</p>
+    <div class="tabs"><div role="tablist" aria-label="Answer-length cap at evaluation">
+      <button role="tab" aria-selected="true" data-ablcap="512">512-token answers</button>
+      <button role="tab" aria-selected="false" data-ablcap="2048">2,048-token answers</button>
+    </div></div>
+    <figure class="fig figwide"><svg id="ablChart" role="img" aria-label="Average accuracy of each ablation, grouped by the part of the method it changes"></svg></figure>
+    <p class="caption">ViRL39K, 10% label budget, same training steps; one run per row (paper Tables 2 and 9). The dashed line is Random-10%.</p>
   </div>
-  <div class="wrap wrap-table">
+  <details class="full wrap wrap-table">
+    <summary>Show full table: mechanisms, both answer lengths and policy entropy</summary>
     <div class="tablewrap"><table id="ablTable" class="abl" aria-label="Table 4: component ablations on ViRL39K"></table></div>
     <p class="tnote">Table 4. Component ablations on ViRL39K under the 10% GRPO training-prompt cap (Tables 2 and 9 in the paper). Mechanism columns show which selector modules are enabled. Avg. is the four-benchmark external average at a 512- or 2,048-token generation cap; Ent. is the final policy entropy. Cadence is how often new prompts enter the training pool: default is the main adaptive schedule, slow refreshes more conservatively, and one-shot stops after the initial discovery pass. Random-10% is shown for reference; red marks an average below it at the same cap. Single training run per row.</p>
-  </div>
+  </details>
 </section>
 
 <section id="cite">
@@ -1047,15 +1079,12 @@ var CL = [
   { x:.72, y:.72, c:'#8E63C7', t:'#EADFF7', d:.62, name:'C4', rx:.215, ry:.18, rot:-17 }
 ];
 var P = [];
-/* clusters of different size, spread and orientation, plus a few stray prompts between them */
+/* clusters of different size, spread and orientation (samples kept within 2 sigma, so every prompt sits inside its cluster) */
 var SHAPE = [ { n:30, sx:.105, sy:.055, rot:-22 }, { n:21, sx:.06, sy:.048, rot:18 }, { n:26, sx:.085, sy:.06, rot:28 }, { n:28, sx:.115, sy:.058, rot:-32 } ];
+function hg2(){ var z; do { z = hg(); } while (Math.abs(z) > 2); return z; }
 CL.forEach(function(c, ci){ var sh = SHAPE[ci], ca = Math.cos(sh.rot*Math.PI/180), sa = Math.sin(sh.rot*Math.PI/180);
-  for (var i = 0; i < sh.n; i++){ var a = hg()*sh.sx, b = hg()*sh.sy;
+  for (var i = 0; i < sh.n; i++){ var a = hg2()*sh.sx, b = hg2()*sh.sy;
     P.push({ x:clamp(c.x + a*ca - b*sa, .05, .95), y:clamp(c.y + a*sa + b*ca, .06, .94), c:ci, emit:0, repr:-1 }); } });
-[[.50,.30],[.47,.55],[.52,.78],[.15,.52],[.88,.47],[.60,.45]].forEach(function(q){
-  var x = clamp(q[0] + hg()*.02, .05, .95), y = clamp(q[1] + hg()*.02, .06, .94), b = 0, bd = 9;
-  CL.forEach(function(c, k){ var d = Math.hypot(c.x - x, c.y - y); if (d < bd){ bd = d; b = k; } });
-  P.push({ x:x, y:y, c:b, emit:0, repr:-1, stray:true }); });
 var order = P.map(function(_, i){ return i; }).sort(function(){ return HR() - .5; });
 order.forEach(function(pi, r){ P[pi].emit = r / P.length; });
 
@@ -1186,12 +1215,14 @@ function drawSpace(label){
   ctx.save(); rrect(SP.x, SP.y, SP.w, SP.h, 14); ctx.fillStyle = '#F6FAF4'; ctx.fill(); ctx.setLineDash([5, 4]); ctx.lineWidth = 1.2; ctx.strokeStyle = '#9CC79A'; ctx.stroke(); ctx.setLineDash([]); ctx.restore();
   if (label) text(label, SP.x + 14, SP.y + 16, 12, col['--ink-3'], 'left', 600);
 }
-/* cluster outline: a 2.2-sigma ellipse fitted to the cluster's own prompts (in screen space) */
-function ellOf(ci){ var m = P.filter(function(p){ return p.c === ci && !p.stray; }), n = m.length;
+/* cluster outline: an ellipse fitted to the cluster's own prompts (in screen space) that encloses all of them */
+function ellOf(ci){ var m = P.filter(function(p){ return p.c === ci; }), n = m.length;
   var mx = m.reduce(function(s, p){ return s + PX(p); }, 0)/n, my = m.reduce(function(s, p){ return s + PY(p); }, 0)/n, a = 0, b = 0, d = 0;
   m.forEach(function(p){ var dx = PX(p) - mx, dy = PY(p) - my; a += dx*dx; b += dx*dy; d += dy*dy; }); a /= n; b /= n; d /= n;
   var tr = (a + d)/2, q = Math.sqrt(Math.max(tr*tr - (a*d - b*b), 0)), ang = .5*Math.atan2(2*b, a - d);
-  var rx = 2.2*Math.sqrt(tr + q) + 9, ry = 2.2*Math.sqrt(Math.max(tr - q, 0)) + 9;
+  var s1 = Math.sqrt(tr + q), s2 = Math.sqrt(Math.max(tr - q, 1e-6)), ca = Math.cos(ang), sa = Math.sin(ang), k = 0;
+  m.forEach(function(p){ var dx = PX(p) - mx, dy = PY(p) - my, u = dx*ca + dy*sa, v = -dx*sa + dy*ca; k = Math.max(k, Math.hypot(u/s1, v/s2)); });
+  var rx = k*s1 + 11, ry = k*s2 + 11;   // just large enough to enclose every prompt of the cluster
   return { x:mx, y:my, rx:rx, ry:ry, ang:ang, hw:Math.hypot(rx*Math.cos(ang), ry*Math.sin(ang)), hh:Math.hypot(rx*Math.sin(ang), ry*Math.cos(ang)) }; }
 function clusterTint(alpha){ if (alpha <= 0) return; var g = .9 + .1*alpha;
   CL.forEach(function(c, ci){ var e = ellOf(ci);
@@ -1482,5 +1513,6 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
 })();
 </script>
 
+<script src="static/js/figs.js" defer></script>
 </body>
 </html>
