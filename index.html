@@ -273,6 +273,21 @@ tbody tr.ours td:first-child{font-weight:700;color:var(--accent-ink)}
 td.best{font-weight:700}
 td.best::after{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--accent);margin-left:5px;vertical-align:2px}
 .tnote{font-size:14px;color:var(--ink-3);margin:10px 0 0}
+.tabs{gap:10px;flex-wrap:wrap}
+.wrap-table{max-width:1240px}
+.t1 td .rng,.t1 td .obs{display:block;line-height:1.25}
+.t1 td .rng{font-size:12px;color:var(--ink-3)}
+.t1 td .obs{font-size:13.5px}
+thead tr.grp th{text-align:center}
+.abl td.c,.abl th:nth-child(n+4):nth-child(-n+7){text-align:center}
+.abl td.tests{font-family:var(--sans);font-size:14px;color:var(--ink-2);text-align:left}
+.abl th:nth-child(2),.abl th:nth-child(3){text-align:left}
+.abl td:nth-child(2){font-family:var(--sans);font-size:15px;text-align:left}
+.abl td.grpcell{font-family:var(--sans);font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);vertical-align:top;border-right:1px solid var(--rule)}
+.abl tr.gstart td{border-top:1px solid var(--rule)}
+.abl td.below{color:var(--hard)}
+
+thead tr.grp.sub th{font-size:11px;letter-spacing:.04em;text-transform:none;padding-top:2px;color:var(--ink-3)}
 .tgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:20px;margin-top:28px;align-items:start}
 .tgrid table{min-width:0}
 
@@ -349,7 +364,7 @@ footer{margin-top:56px;border-top:1px solid var(--rule);padding-block:24px 36px;
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Paper
       </a>
       <!-- TODO: add href to the arXiv page, then drop class "soon", aria-disabled and the tag span -->
-      <a class="btn soon" aria-disabled="true">arXiv <span class="tag">soon</span></a>
+      <a class="btn" href="https://arxiv.org/abs/2611.11145" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>arXiv</a>
       <!-- TODO: add href to the code repository -->
       <a class="btn soon" aria-disabled="true">Code <span class="tag">soon</span></a>
     </div>
@@ -478,17 +493,38 @@ footer{margin-top:56px;border-top:1px solid var(--rule);padding-block:24px 36px;
 <section id="results">
   <div class="wrap">
     <h2>Results</h2>
-    <p class="prose" style="color:var(--ink-2)">Every method trains Qwen3-VL-2B with the same GRPO recipe and number of optimizer steps, and is evaluated on four multimodal math benchmarks. Budgeted methods differ only in which prompts they verify. With 10% of ViRL39K, <span class="sc">Discover</span> reaches a 13.12 average, compared with 10.38 for Random-10% and 9.71 for training on the full split. Across three ViRL39K training seeds it averages 13.25 ± 0.55, compared with 10.01 ± 0.54 for Random-10%. Only 1.16% of the pool is verified first for the selector (the REPR probes), and there is no full-pool scan.</p>
-    <div class="tabs"><div role="tablist" aria-label="Training dataset">
-      <button role="tab" aria-selected="true" data-ds="virl">ViRL39K</button>
-      <button role="tab" aria-selected="false" data-ds="vlaa">VLAA-Thinking</button>
-    </div></div>
-    <div class="tablewrap"><table id="resTable" aria-label="Table 1: benchmark accuracy and prompt exposure"></table></div>
-    <p class="tnote">Table 1. Training-first: % of source prompts first verified when admitted to GRPO. Selector-first: % first verified to seed or score the selector; REPR probes can later enter GRPO without new verification. Total: all verified prompts. Dense-scored baselines (Hard, MaxVar, VADE) scan the 90% training split, so they are not exposure-matched. Probe Gen.: selector-only generations as a multiple of pool size N. A dot marks the best value in each column. Single training run per row.</p>
+    <p class="prose" style="color:var(--ink-2)">Every method trains Qwen3-VL-2B with the same GRPO recipe and number of optimizer steps, and is evaluated on four multimodal math benchmarks. Budgeted methods differ only in which prompts they verify. With 10% of ViRL39K, <span class="sc">Discover</span> reaches a 13.12 average in the main run (Table 1), compared with 10.38 for Random-10% and 9.71 for training on the full split. Across three ViRL39K training seeds it averages 13.25 ± 0.55, compared with 10.01 ± 0.54 for Random-10%. Only 1.16% of the pool is verified first for the selector (the REPR probes), and there is no full-pool scan.</p>
+    <div class="tabs">
+      <div role="tablist" aria-label="Training dataset">
+        <button role="tab" aria-selected="true" data-ds="virl">ViRL39K</button>
+        <button role="tab" aria-selected="false" data-ds="vlaa">VLAA-Thinking</button>
+      </div>
+      <div role="tablist" aria-label="Generation cap at evaluation">
+        <button role="tab" aria-selected="true" data-cap="512">512 tokens</button>
+        <button role="tab" aria-selected="false" data-cap="2048">2,048 tokens</button>
+      </div>
+    </div>
+  </div>
+  <div class="wrap wrap-table">
+    <div class="tablewrap"><table id="resTable" class="t1" aria-label="Table 1: benchmark accuracy, verified-prompt exposure and selector cost"></table></div>
+    <p class="tnote">Table 1. External benchmark accuracy with verified-prompt exposure and selector cost. Exposure is a percentage of the full source pool, split by acquisition (Selector-first, Training-first) and by final use (Train, Probe-only); both views sum to Total. Range cells give deterministic admission bounds (not confidence intervals), with the observed value (obs.) below. Dense-scored baselines (Hard, MaxVar, VADE) scan the 90% training split and are not exposure-matched to strict-budget methods. Probe Gen.: selector-only generations as a multiple of the pool size N. A dot marks the best value in each accuracy column. Single training run per row. The 2,048-token view is Table 8 in the paper's appendix.</p>
+  </div>
+  <div class="wrap">
     <div class="tgrid">
       <div><div class="tablewrap"><table aria-label="Table 2: average accuracy across three ViRL39K training seeds"><thead><tr><th>Method</th><th>Seed I</th><th>Seed II</th><th>Seed III</th><th>Mean ± SD</th></tr></thead><tbody><tr class="ours"><td><span class="sc">Discover</span>-10%</td><td>13.12</td><td>13.86</td><td>12.78</td><td>13.25 ± 0.55</td></tr><tr><td>Random-10%</td><td>10.38</td><td>10.25</td><td>9.39</td><td>10.01 ± 0.54</td></tr><tr class="ours"><td><span class="sc">Discover</span>-5%</td><td>10.53</td><td>13.18</td><td>15.09</td><td>12.93 ± 2.29</td></tr><tr><td>Random-5%</td><td>10.94</td><td>8.42</td><td>10.52</td><td>9.96 ± 1.35</td></tr></tbody></table></div><p class="tnote">Table 2. Average accuracy over three ViRL39K training seeds. At 10%, <span class="sc">Discover</span> beats Random by +3.25 ± 0.45 points (95% CI [2.12, 4.37]). Results at 5% vary more across seeds.</p></div>
       <div><div class="tablewrap"><table aria-label="Table 3: paired-bootstrap gains of DISCOVER-10% over baselines on ViRL39K"><thead><tr><th><span class="sc">Discover</span>-10% vs.</th><th>Gain (pts)</th><th>95% CI</th></tr></thead><tbody><tr><td>Random-10%</td><td>+2.74</td><td>[+1.95, +3.53]</td></tr><tr><td>MaxVar-10%</td><td>+2.08</td><td>[+1.01, +3.12]</td></tr><tr><td>Hard-10%</td><td>+4.38</td><td>[+3.50, +5.24]</td></tr><tr><td>Full-data GRPO</td><td>+3.41</td><td>[+2.52, +4.30]</td></tr></tbody></table></div><p class="tnote">Table 3. Paired-bootstrap gains on fixed ViRL39K checkpoints, over 10,994 benchmark items. Every interval is above zero.</p></div>
     </div>
+  </div>
+</section>
+
+<section id="ablations">
+  <div class="wrap">
+    <h2>Ablations</h2>
+    <p class="prose" style="color:var(--ink-2)">Each row changes one part of <span class="sc">Discover</span> on ViRL39K under the same 10% budget. Spreading the budget over clusters without a utility score falls below Random-10%. Every replacement for neighbour transfer (random scores, Ridge, Ridge with extra probes, an MLP) loses accuracy. Ranking once and never refreshing loses over three points, and so does admitting new prompts more slowly. Every variant stays below the full method at both generation caps.</p>
+  </div>
+  <div class="wrap wrap-table">
+    <div class="tablewrap"><table id="ablTable" class="abl" aria-label="Table 4: component ablations on ViRL39K"></table></div>
+    <p class="tnote">Table 4. Component ablations on ViRL39K under the 10% GRPO training-prompt cap (Tables 2 and 9 in the paper). Mechanism columns show which selector modules are enabled. Avg. is the four-benchmark external average at a 512- or 2,048-token generation cap; Ent. is the final policy entropy. Cadence is how often new prompts enter the training pool: default is the main adaptive schedule, slow refreshes more conservatively, and one-shot stops after the initial discovery pass. Random-10% is shown for reference; red marks an average below it at the same cap. Single training run per row.</p>
   </div>
 </section>
 
@@ -546,54 +582,106 @@ function barChart(el, cfg){
   el.innerHTML = out;
 }
 
-/* ---------- results table ---------- */
+/* ---------- results table (arXiv v1, Tables 1 and 8) ---------- */
 var COLS = ['WeMath','MathVerse','MATH-Vision','DynaMath','Avg.'];
+function R(lo, hi, obs){ return {lo: lo, hi: hi, obs: obs}; }
+/* [method, Selector-first, Training-first, Train, Probe-only, Total, Probe Gen. (xN), accuracy @512 tokens, accuracy @2,048 tokens] */
 var DATA = {
   virl: [
-    ['Base Qwen3-VL-2B', null, null, null, null,  [ 1.78, 8.81,4.61,16.23, 7.86]],
-    ['Random-5%',        5.00, 0.00, 5.00, 0,    [11.26,10.18,5.61,16.72,10.94]],
-    ['Random-10%',      10.00, 0.00,10.00, 0,    [10.12, 9.66,5.59,16.14,10.38]],
-    ['Hard-10%',         0.00,90.00,90.00, 0.90, [ 1.67, 9.75,7.24,16.31, 8.74]],
-    ['MaxVar-10%',       0.00,90.00,90.00, 7.20, [ 6.49,10.71,9.87,17.09,11.04]],
-    ['DOTS-MM-10%',      6.64, 3.36,10.00, 0.27, [ 3.39, 8.93,7.24,16.93, 9.12]],
-    ['VADE original',    0.00,90.00,90.00, 7.20, [ 0.92, 9.59,6.25,16.51, 8.32]],
-    ['VADE-10%',         0.00,90.00,90.00, 7.20, [ 5.86, 9.16,6.25,15.35, 9.15]],
-    ['Full train split',90.00, 0.00,90.00, 0,    [ 6.32, 9.92,5.92,16.67, 9.71]],
-    ['DISCOVER-5%',      3.84, 1.16, 5.00, 0.09, [ 6.85,10.53,7.56,17.21,10.53]],
-    ['DISCOVER-10%',     8.84, 1.16,10.00, 0.09, [13.45,11.12,7.57,20.32,13.12]]
+    ['Base Qwen3-VL-2B', null, null, null, null, null, null, [ 1.78, 8.81,4.61,16.23, 7.86], [ 3.05, 9.59, 7.89,19.46,10.00]],
+    ['Random-5%',         0.00, 5.00, 5.00, 0.00, 5.00, 0,    [11.26,10.18,5.61,16.72,10.94], [16.26,11.37,23.03,23.89,18.64]],
+    ['Random-10%',        0.00,10.00,10.00, 0.00,10.00, 0,    [10.12, 9.66,5.59,16.14,10.38], [19.25,11.55,20.07,22.87,18.44]],
+    ['Hard-10%',         90.00, 0.00,10.00,80.00,90.00, 0.90, [ 1.67, 9.75,7.24,16.31, 8.74], [ 6.15,12.51,18.75,22.16,14.89]],
+    ['MaxVar-10%',       90.00, 0.00,10.00,80.00,90.00, 7.20, [ 6.49,10.71,9.87,17.09,11.04], [13.10,11.62,25.00,21.78,17.88]],
+    ['DOTS-MM-10%',       3.36, 6.64, R(6.64,10.00,9.68), R(0.00,3.36,0.32), 10.00, 0.27, [ 3.39, 8.93,7.24,16.93, 9.12], [ 7.82,10.10,22.70,22.38,15.75]],
+    ['VADE original',    90.00, 0.00,47.77,42.23,90.00, 7.20, [ 0.92, 9.59,6.25,16.51, 8.32], [ 6.72,11.50,18.09,22.22,14.63]],
+    ['VADE-10%',         90.00, 0.00,10.00,80.00,90.00, 7.20, [ 5.86, 9.16,6.25,15.35, 9.15], [14.31,11.55,18.75,23.03,16.91]],
+    ['Full train split',  0.00,90.00,90.00, 0.00,90.00, 0,    [ 6.32, 9.92,5.92,16.67, 9.71], [15.34,13.07,16.12,23.33,16.97]],
+    ['DISCOVER-5%',       1.16, 3.84, R(3.84, 5.00,4.49), R(0.00,1.16,0.51),  5.00, 0.09, [ 6.85,10.53,7.56,17.21,10.53], [20.93,13.28,18.21,23.94,19.09]],
+    ['DISCOVER-10%',      1.16, 8.84, R(8.84,10.00,9.57), R(0.00,1.16,0.43), 10.00, 0.09, [13.45,11.12,7.57,20.32,13.12], [26.21,13.40,18.42,27.31,21.33]]
   ],
   vlaa: [
-    ['Base Qwen3-VL-2B', null, null, null, null,  [ 1.78, 8.81,4.61,16.23, 7.86]],
-    ['Random-5%',        5.00, 0.00, 5.00, 0,    [11.32,12.16,5.92,20.10,12.38]],
-    ['Random-10%',      10.00, 0.00,10.00, 0,    [ 8.68,11.57,5.26,19.76,11.32]],
-    ['Hard-10%',         0.00,90.00,90.00, 0.90, [ 4.25,11.47,5.02,18.74, 9.87]],
-    ['MaxVar-10%',       0.00,90.00,90.00, 7.20, [ 7.83,12.05,6.19,20.96,11.76]],
-    ['DOTS-MM-10%',      5.40, 4.60,10.00, 0.37, [ 4.10,10.76,5.72,20.38,10.24]],
-    ['VADE original',    0.00,90.00,90.00, 7.20, [ 1.62,11.18,4.84,20.08, 9.43]],
-    ['VADE-10%',         0.00,90.00,90.00, 7.20, [ 6.52,10.90,4.80,18.92,10.29]],
-    ['Full train split',90.00, 0.00,90.00, 0,    [ 9.25,11.73,6.25,21.30,12.13]],
-    ['DISCOVER-5%',      3.41, 1.59, 5.00, 0.13, [ 8.24,12.52,6.04,20.11,11.73]],
-    ['DISCOVER-10%',     8.41, 1.59,10.00, 0.13, [13.05,13.45,4.93,21.34,13.19]]
+    ['Base Qwen3-VL-2B', null, null, null, null, null, null, [ 1.78, 8.81,4.61,16.23, 7.86], [ 3.05, 9.59, 7.89,19.46,10.00]],
+    ['Random-5%',         0.00, 5.00, 5.00, 0.00, 5.00, 0,    [11.32,12.16,5.92,20.10,12.38], [22.76,17.28,10.86,27.47,19.59]],
+    ['Random-10%',        0.00,10.00,10.00, 0.00,10.00, 0,    [ 8.68,11.57,5.26,19.76,11.32], [16.21,16.88,14.14,25.71,18.23]],
+    ['Hard-10%',         90.00, 0.00,10.00,80.00,90.00, 0.90, [ 4.25,11.47,5.02,18.74, 9.87], [14.76,16.97,13.72,26.23,17.92]],
+    ['MaxVar-10%',       90.00, 0.00,10.00,80.00,90.00, 7.20, [ 7.83,12.05,6.19,20.96,11.76], [18.71,17.43,14.06,28.25,19.61]],
+    ['DOTS-MM-10%',       4.60, 5.40, R(5.40,10.00,9.56), R(0.00,4.60,0.44), 10.00, 0.37, [ 4.10,10.76,5.72,20.38,10.24], [18.16,16.98,12.17,27.41,18.68]],
+    ['VADE original',    90.00, 0.00,47.25,42.75,90.00, 7.20, [ 1.62,11.18,4.84,20.08, 9.43], [11.14,16.63,13.08,27.48,17.08]],
+    ['VADE-10%',         90.00, 0.00,10.00,80.00,90.00, 7.20, [ 6.52,10.90,4.80,18.92,10.29], [17.16,16.27,13.07,26.25,18.19]],
+    ['Full train split',  0.00,90.00,90.00, 0.00,90.00, 0,    [ 9.25,11.73,6.25,21.30,12.13], [19.77,16.90,15.79,27.84,20.08]],
+    ['DISCOVER-5%',       1.59, 3.41, R(3.41, 5.00,4.74), R(0.00,1.59,0.26),  5.00, 0.13, [ 8.24,12.52,6.04,20.11,11.73], [21.23,18.16,13.98,28.19,20.39]],
+    ['DISCOVER-10%',      1.59, 8.41, R(8.41,10.00,9.80), R(0.00,1.59,0.20), 10.00, 0.13, [13.05,13.45,4.93,21.34,13.19], [28.74,20.00,16.12,29.00,23.46]]
   ]
 };
+var tblState = { ds: 'virl', cap: 512 };
 function nameHtml(n){ return n.indexOf('DISCOVER') === 0 ? SC + n.slice(8) : esc(n); }
-function renderTable(ds){
-  var rows = DATA[ds];
-  var best = COLS.map(function(_, c){ return Math.max.apply(null, rows.map(function(r){ return r[5][c]; })); });
-  var h = '<thead><tr class="grp"><th></th><th class="gs" colspan="3">Verified prompts ↓</th><th class="gs">Selector ↓</th><th class="gs" colspan="5">Accuracy (%) ↑</th></tr>' +
-    '<tr><th>Method</th><th class="gs">Training-first</th><th>Selector-first</th><th>Total</th><th class="gs">Probe Gen.</th>' +
+function renderTable(){
+  var rows = DATA[tblState.ds], ai = tblState.cap === 512 ? 7 : 8;
+  var best = COLS.map(function(_, c){ return Math.max.apply(null, rows.map(function(r){ return r[ai][c]; })); });
+  var h = '<thead><tr class="grp"><th></th><th class="gs" colspan="5">Verified prompts (% of pool) ↓</th><th class="gs">Selector ↓</th><th class="gs" colspan="5">Accuracy (%) ↑</th></tr>' +
+    '<tr class="grp sub"><th></th><th class="gs" colspan="2">By acquisition</th><th colspan="2">By final use</th><th></th><th class="gs"></th><th class="gs" colspan="5">' + (tblState.cap === 512 ? '512' : '2,048') + '-token cap</th></tr>' +
+    '<tr><th>Method</th><th class="gs">Selector-first</th><th>Training-first</th><th>Train</th><th>Probe-only</th><th>Total</th><th class="gs">Probe Gen.</th>' +
     COLS.map(function(c, i){ return '<th' + (i === 0 ? ' class="gs"' : '') + '>' + c + '</th>'; }).join('') + '</tr></thead><tbody>';
-  function cell(v, suf){ return v == null ? '–' : v.toFixed(2) + (suf || ''); }
+  function cell(v, suf){
+    if (v == null) return '–';
+    if (typeof v === 'object') return '<span class="rng">∈ [' + v.lo.toFixed(2) + ', ' + v.hi.toFixed(2) + ']</span><span class="obs">obs. ' + v.obs.toFixed(2) + '</span>';
+    return (v === 0 && suf ? '0' : v.toFixed(2)) + (suf && v !== 0 ? suf : '');
+  }
   rows.forEach(function(r){
     h += '<tr' + (r[0].indexOf('DISCOVER') === 0 ? ' class="ours"' : (r[1] == null ? ' class="base"' : '')) + '><td>' + nameHtml(r[0]) + '</td>' +
-      '<td class="gs">' + cell(r[1]) + '</td><td>' + cell(r[2]) + '</td><td>' + cell(r[3]) + '</td><td class="gs">' + cell(r[4], '×') + '</td>' +
-      r[5].map(function(v, c){ return '<td class="' + (c === 0 ? 'gs ' : '') + (v === best[c] ? 'best' : '') + '">' + v.toFixed(2) + '</td>'; }).join('') + '</tr>';
+      '<td class="gs">' + cell(r[1]) + '</td><td>' + cell(r[2]) + '</td><td>' + cell(r[3]) + '</td><td>' + cell(r[4]) + '</td><td>' + cell(r[5]) + '</td><td class="gs">' + cell(r[6], '×') + '</td>' +
+      r[ai].map(function(v, c){ return '<td class="' + (c === 0 ? 'gs ' : '') + (v === best[c] ? 'best' : '') + '">' + v.toFixed(2) + '</td>'; }).join('') + '</tr>';
   });
   document.getElementById('resTable').innerHTML = h + '</tbody>';
 }
-var tabs = document.querySelectorAll('.tabs button');
-tabs.forEach(function(b){ b.addEventListener('click', function(){ tabs.forEach(function(x){ x.setAttribute('aria-selected', x === b ? 'true' : 'false'); }); renderTable(b.getAttribute('data-ds')); }); });
-renderTable('virl');
+document.querySelectorAll('.tabs [data-ds], .tabs [data-cap]').forEach(function(b){
+  b.addEventListener('click', function(){
+    var key = b.hasAttribute('data-ds') ? 'ds' : 'cap';
+    b.parentNode.querySelectorAll('button').forEach(function(x){ x.setAttribute('aria-selected', x === b ? 'true' : 'false'); });
+    tblState[key] = key === 'ds' ? b.getAttribute('data-ds') : Number(b.getAttribute('data-cap'));
+    renderTable();
+
+    if (typeof renderAbl === 'function') renderAbl();
+  });
+});
+renderTable();
+
+/* ---------- ablation table (arXiv v1, Tables 2 and 9) ---------- */
+var ABL = [
+  ['Reference', [['Full DISCOVER', 'Reference setting', 'KNN', 'asym', true, 'default', 13.12, 21.33, 0.20]]],
+  ['Predictor', [
+    ['Coverage only', 'Coverage without utility', '×', '×', false, 'one-shot', 8.23, 13.80, 0.40],
+    ['One-shot KNN', 'One-shot vs. online KNN', 'KNN', 'asym', false, 'one-shot', 10.03, 16.47, 0.30],
+    ['MLP transfer', 'Learned vs. local transfer', 'MLP', 'asym', true, 'default', 11.32, 20.14, 0.23],
+    ['Ridge transfer', 'Linear vs. local transfer', 'Ridge', 'asym', true, 'default', 8.80, 14.94, 0.28],
+    ['Ridge active probes', 'More probes for Ridge', 'Ridge+AP', 'asym', true, 'default', 10.86, 18.08, 0.09],
+    ['Random score', 'Random predictor', 'random', 'asym', true, 'default', 10.02, 17.16, 0.26],
+    ['Random score (slow)', 'Random predictor', 'random', 'asym', true, 'slow', 10.76, 20.12, 0.36]]],
+  ['Utility', [
+    ['No hard-side bias', 'Asymmetric utility bias', 'KNN', 'symmetric', true, 'default', 10.43, 17.89, 0.38],
+    ['Dead-zone h=0.8', 'Easy-filter aggressiveness', 'KNN', 'h=0.8', true, 'default', 11.12, 16.15, 0.12]]],
+  ['Cadence', [['Slow cadence', 'Delayed-freeze control', 'KNN', 'asym', true, 'slow', 9.51, 16.23, 0.28]]]
+];
+var ABL_RANDOM = [10.38, 18.44];
+function renderAbl(){
+  var h = '<thead><tr class="grp"><th></th><th></th><th></th><th class="gs" colspan="4">Mechanism</th><th class="gs" colspan="2">Avg. (%) ↑</th><th class="gs"></th></tr>' +
+    '<tr><th>Group</th><th>Intervention</th><th>Tests</th><th class="gs">Transfer</th><th>Utility</th><th>Refresh</th><th>Cadence</th><th class="gs">512 tokens</th><th>2,048 tokens</th><th class="gs">Ent.</th></tr></thead><tbody>';
+  ABL.forEach(function(g){
+    g[1].forEach(function(r, k){
+      var ours = r[0] === 'Full DISCOVER';
+      function avg(v, i){ return '<td class="' + (i === 0 ? 'gs ' : '') + (v < ABL_RANDOM[i] ? 'below' : '') + '">' + v.toFixed(2) + '</td>'; }
+      h += '<tr class="' + (ours ? 'ours' : '') + (k === 0 ? ' gstart' : '') + '">' +
+        (k === 0 ? '<td class="grpcell" rowspan="' + g[1].length + '">' + g[0] + '</td>' : '') +
+        '<td>' + (ours ? SC + ' (full)' : esc(r[0])) + '</td><td class="tests">' + esc(r[1]) + '</td>' +
+        '<td class="gs c">' + esc(r[2]) + '</td><td class="c">' + esc(r[3]) + '</td><td class="c">' + (r[4] ? '✓' : '×') + '</td><td class="c">' + r[5] + '</td>' +
+        avg(r[6], 0) + avg(r[7], 1) + '<td class="gs">' + r[8].toFixed(2) + '</td></tr>';
+    });
+  });
+  h += '<tr class="base gstart"><td class="grpcell">Baseline</td><td>Random-10%</td><td class="tests">No selector (Table 1)</td><td class="gs c">–</td><td class="c">–</td><td class="c">–</td><td class="c">–</td><td class="gs">' + ABL_RANDOM[0].toFixed(2) + '</td><td>' + ABL_RANDOM[1].toFixed(2) + '</td><td class="gs">–</td></tr>';
+  document.getElementById('ablTable').innerHTML = h + '</tbody>';
+}
+renderAbl();
 
 /* copy bibtex */
 var copyBtn = document.getElementById('copyBtn');
