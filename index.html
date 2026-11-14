@@ -1041,10 +1041,10 @@ function uCol(x){ return mix('#F3F4F7', '#C2185B', clamp(x, 0, 1)); }
 
 /* data: 4 clusters, like Figure 1 */
 var CL = [
-  { x:.25, y:.30, c:'#4F7FD9', t:'#DCE6FA', d:.45, name:'C1' },
-  { x:.73, y:.27, c:'#3E9B3E', t:'#DDF0DA', d:.86, name:'C2' },
-  { x:.29, y:.74, c:'#D9534F', t:'#F9DEDC', d:.12, name:'C3' },
-  { x:.72, y:.72, c:'#8E63C7', t:'#EADFF7', d:.62, name:'C4' }
+  { x:.25, y:.30, c:'#5B7DB8', t:'#E3E9F3', d:.45, name:'C1', rx:.22, ry:.2, rot:-14 },
+  { x:.73, y:.27, c:'#3E8E8A', t:'#DFEDEC', d:.86, name:'C2', rx:.2, ry:.21, rot:20 },
+  { x:.29, y:.74, c:'#B07D2A', t:'#F3EADB', d:.12, name:'C3', rx:.2, ry:.18, rot:9 },
+  { x:.72, y:.72, c:'#8B6BB0', t:'#ECE6F3', d:.62, name:'C4', rx:.215, ry:.18, rot:-17 }
 ];
 var P = [];
 CL.forEach(function(c, ci){ for (var i = 0; i < 26; i++) P.push({ x:clamp(c.x + hg()*.085, .05, .95), y:clamp(c.y + hg()*.075, .06, .94), c:ci, emit:0, repr:-1 }); });
@@ -1175,15 +1175,25 @@ function tick(x, y, s, ok){ ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.stro
 function arrow(x1, y1, x2, y2, c, w){ ctx.strokeStyle = c; ctx.fillStyle = c; ctx.lineWidth = w || 2; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); var a = Math.atan2(y2 - y1, x2 - x1), h = 7; ctx.beginPath(); ctx.moveTo(x2, y2); ctx.lineTo(x2 - h*Math.cos(a - .45), y2 - h*Math.sin(a - .45)); ctx.lineTo(x2 - h*Math.cos(a + .45), y2 - h*Math.sin(a + .45)); ctx.closePath(); ctx.fill(); }
 
 function drawSpace(label){
-  ctx.save(); rrect(SP.x, SP.y, SP.w, SP.h, 14); ctx.fillStyle = '#F6FAF4'; ctx.fill(); ctx.setLineDash([5, 4]); ctx.lineWidth = 1.2; ctx.strokeStyle = '#9CC79A'; ctx.stroke(); ctx.setLineDash([]); ctx.restore();
+  ctx.save(); rrect(SP.x, SP.y, SP.w, SP.h, 14); ctx.fillStyle = '#F7F8F9'; ctx.fill(); ctx.setLineDash([6, 5]); ctx.lineWidth = 1.3; ctx.strokeStyle = '#D3D7DD'; ctx.stroke(); ctx.setLineDash([]); ctx.restore();
   if (label) text(label, SP.x + 14, SP.y + 16, 12, col['--ink-3'], 'left', 600);
 }
-function clusterTint(alpha){ if (alpha <= 0) return; CL.forEach(function(c){ ctx.globalAlpha = alpha; ctx.beginPath(); ctx.ellipse(SP.x + 24 + c.x*(SP.w - 48), SP.y + 22 + c.y*(SP.h - 44), (SP.w - 48)*.17, (SP.h - 44)*.16, 0, 0, Math.PI*2); ctx.fillStyle = c.t; ctx.fill(); }); ctx.globalAlpha = 1; }
+function clusterTint(alpha){ if (alpha <= 0) return; var g = .88 + .12*alpha;
+  CL.forEach(function(c){ var sx = SP.w - 48, sy = SP.h - 44, r = Math.min(sx, sy);
+    ctx.beginPath(); ctx.ellipse(SP.x + 24 + c.x*sx, SP.y + 22 + c.y*sy, r*c.rx*g*(sx/r*.62 + .38), r*c.ry*g, c.rot*Math.PI/180, 0, Math.PI*2);
+    ctx.globalAlpha = .14*alpha; ctx.fillStyle = c.c; ctx.fill();
+    ctx.globalAlpha = .38*alpha; ctx.lineWidth = 1.4; ctx.strokeStyle = c.c; ctx.stroke(); });
+  ctx.globalAlpha = 1; }
+/* a prompt whose predicted pass rate is known: outlined diamond filled from the bottom up to that rate */
+function gauge(x, y, r, m, a){ var cc = muCol(m); ctx.save(); ctx.globalAlpha *= (a == null ? 1 : a);
+  diamond(x, y, r, '#fff', cc, 1.5);
+  ctx.beginPath(); ctx.rect(x - r - 2, y + r - 2*r*clamp(m, 0, 1), 2*r + 4, 2*r*clamp(m, 0, 1) + 2); ctx.clip();
+  diamond(x, y, r, cc); ctx.restore(); }
 function basePoints(alpha, colorFn, skipRepr){
-  P.forEach(function(p){ if (skipRepr && p.repr >= 0) return; var cc = colorFn(p); ctx.globalAlpha = alpha; diamond(PX(p), PY(p), 5.2, cc[0], cc[1]); });
+  P.forEach(function(p){ if (skipRepr && p.repr >= 0) return; var cc = colorFn(p); ctx.globalAlpha = alpha; diamond(PX(p), PY(p), 5.6, cc[0], cc[1], 1.5); });
   ctx.globalAlpha = 1;
 }
-function clusterColors(p){ var c = CL[p.c]; return [c.t, c.c]; }
+function clusterColors(p){ var c = CL[p.c]; return ['#fff', c.c]; }
 function reprStars(scaleT, labels){
   REPR.forEach(function(r, j){ var p = r.p, c = CL[p.c], s = scaleT(j); if (s <= 0) return;
     star4(PX(p), PY(p), 5 + 7*s, c.c, '#fff');
@@ -1220,9 +1230,9 @@ function stage1(t){
     var k1 = seg(t, te, te + .45), k2 = seg(t, te + .45, te + 1.05);
     if (k1 < 1){ var x = lerp(cx, inX, ease(k1)), y = lerp(pl.y + pl.h*.4, inY, ease(k1)); ctx.globalAlpha = .9; rrect(x - 6, y - 5, 12, 10, 2); ctx.fillStyle = '#fff'; ctx.fill(); ctx.strokeStyle = '#9AA0AC'; ctx.lineWidth = 1; ctx.stroke(); ctx.globalAlpha = 1; return; }
     var tx = PX(p), ty = PY(p), x2 = lerp(outX, tx, ease(k2)), y2 = lerp(outY, ty, ease(k2));
-    var colr = ['#E3E5EA', '#9AA0AC'];
-    if (t > 4.6){ var itn = Math.min(Math.floor((t - 4.6)/.8), KM.length - 1), c = CL[cid[KM[itn].a[P.indexOf(p)]]]; colr = [c.t, c.c]; }
-    diamond(x2, y2, 5.2, colr[0], colr[1]);
+    var colr = ['#fff', '#9CA3AF'];
+    if (t > 4.6){ var itn = Math.min(Math.floor((t - 4.6)/.8), KM.length - 1), c = CL[cid[KM[itn].a[P.indexOf(p)]]]; colr = ['#fff', c.c]; }
+    diamond(x2, y2, 5.6, colr[0], colr[1], 1.5);
   });
   if (t > 4.6){
     var ft = (t - 4.6)/.8, it0 = Math.min(Math.floor(ft), KM.length - 1), it1 = Math.min(it0 + 1, KM.length - 1), fr = ease(ft - Math.floor(ft));
@@ -1231,6 +1241,7 @@ function stage1(t){
       ctx.lineWidth = 2; ctx.strokeStyle = cc; ctx.stroke(); });
     text('iteration ' + (it0 + 1) + ' / ' + KM.length, RX(), RY(), 11, col['--ink-3'], RA(), 500);
   }
+  if (t > 7.4){ ctx.save(); clusterTint(seg(t, 7.4, 8.2)); ctx.restore(); }
   if (t > 8){ ctx.globalAlpha = seg(t, 8, 8.6); CL.forEach(function(c){ text(c.name, SP.x + 24 + c.x*(SP.w - 48) + (SP.w - 48)*.15, SP.y + 22 + c.y*(SP.h - 44) - (SP.h - 44)*.14, 13, c.c, 'center', 700); }); ctx.globalAlpha = 1; }
 }
 /* ---- stage 2: REPR selection ---- */
@@ -1244,7 +1255,7 @@ function stage2(t){
   var dim = seg(t, 3.2, 4.2);
   basePoints(1 - .55*dim, clusterColors, true);
   REPR.forEach(function(r, j){ var p = r.p, k = seg(t, pickT(j), pickT(j) + .4);
-    if (k <= 0){ diamond(PX(p), PY(p), 5.2, CL[p.c].t, CL[p.c].c); return; }
+    if (k <= 0){ diamond(PX(p), PY(p), 5.6, '#fff', CL[p.c].c, 1.5); return; }
     if (j % 2 === 0 && t < pickT(j + 1) + .6){ ctx.globalAlpha = .7*(1 - seg(t, pickT(j + 1), pickT(j + 1) + .6)); ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.arc(PX(p), PY(p), .07*(SP.w - 48), 0, Math.PI*2); ctx.strokeStyle = CL[p.c].c; ctx.lineWidth = 1.2; ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1; }
     var pul = reduceMo ? 0 : .12*Math.sin(t*3 + j);
     star4(PX(p), PY(p), (5 + 7*ease(k))*(1 + pul*seg(t, 7, 7.5)), CL[p.c].c, '#fff');
@@ -1326,8 +1337,8 @@ function stage4(t){
   P.forEach(function(p){ if (p.repr >= 0) return;
     var x = PX(p), y = PY(p), tr = p === target ? 4.0 : ripple(p), k = seg(t, tr, tr + .4);
     if (p !== target && k > 0 && k < 1){ var n = REPR[p.nb[0].j].p; ctx.globalAlpha = .5*(1 - k); ctx.setLineDash([2, 3]); ctx.beginPath(); ctx.moveTo(PX(n), PY(n)); ctx.lineTo(x, y); ctx.strokeStyle = col['--ink-3']; ctx.lineWidth = 1; ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1; }
-    if (k <= 0) diamond(x, y, 5.2, '#fff', '#B9BEC9');
-    else diamond(x, y, 5.2 + 1.2*Math.sin(Math.PI*k)*(k < 1 ? 1 : 0), muCol(p.mu), '#fff', 1.2);
+    if (k <= 0) diamond(x, y, 5.6, '#fff', '#B9BEC9', 1.5);
+    else gauge(x, y, 5.6 + 1.2*Math.sin(Math.PI*k)*(k < 1 ? 1 : 0), p.mu*ease(k));
   });
   // target and its neighbours
   var tx = PX(target), ty = PY(target), hl = seg(t, .6, 1.2) * (1 - seg(t, 9.6, 10.4));
@@ -1356,7 +1367,7 @@ function stage4(t){
   ctx.globalAlpha = seg(t, 0, .6);
   var ry = rowY + 3*40 + 6; ctx.strokeStyle = col['--rule']; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(b.x + 18, ry); ctx.lineTo(b.x + b.w - 14, ry); ctx.stroke();
   var rk = seg(t, 3.6, 4.2);
-  if (rk > 0){ ctx.globalAlpha = rk; diamond(b.x + 28, ry + 30, 8, muCol(target.mu), '#fff');
+  if (rk > 0){ ctx.globalAlpha = rk; gauge(b.x + 28, ry + 30, 8.5, target.mu);
     rich('$\\hat{\\mu} = ' + target.mu.toFixed(2) + '$', b.x + 46, ry + 30, 14, muCol(target.mu), 'left', 700);
     rich('$\\hat{v} = ' + target.v.toFixed(2) + '$', b.x + 150, ry + 30, 14, col['--accent'], 'left', 700); }
   // legend
@@ -1374,8 +1385,8 @@ function stage5(t){
   var heat = seg(t, 12.8, 14.2);
   P.forEach(function(p){ if (p.repr >= 0) return; var x = PX(p), y = PY(p);
     var fill = heat > 0 ? mix('#F3F4F7', '#C2185B', 0) : muCol(p.mu);
-    if (heat > 0){ var uc = p.u > 0 ? uCol(p.u/UMAX) : '#E9EBEF'; ctx.globalAlpha = 1; diamond(x, y, 5.2, muCol(p.mu), '#fff'); ctx.globalAlpha = heat; diamond(x, y, 5.2 + 2*(p.u/UMAX)*heat, uc, p.u > 0 ? '#fff' : '#C9CDD5'); ctx.globalAlpha = 1; }
-    else diamond(x, y, 5.2, fill, '#fff');
+    if (heat > 0){ var uc = p.u > 0 ? uCol(p.u/UMAX) : '#E9EBEF'; ctx.globalAlpha = 1; gauge(x, y, 5.6, p.mu); ctx.globalAlpha = heat; diamond(x, y, 5.6 + 2*(p.u/UMAX)*heat, uc, p.u > 0 ? '#fff' : '#C9CDD5', 1.2); ctx.globalAlpha = 1; }
+    else gauge(x, y, 5.6, p.mu);
   });
   reprStars(function(){ return 1; }, null);
   var adm = seg(t, 14.6, 15.4);
